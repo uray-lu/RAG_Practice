@@ -1,0 +1,18 @@
+# venv, .env
+
+.env
+venv
+venv_ubuntu/
+
+
+# document
+documents
+vectorstores
+
+#test
+playground.py
+test.py
+
+
+# cache
+__pycache__
