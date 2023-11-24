@@ -2,56 +2,51 @@
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import RetrievalQA
+from utils.aws_client import AWSBedRockLLM
+from utils.Config import Config
+from langchain.vectorstores.faiss import FAISS
+from SyncVectorDBHandler import S3SyncVectorDBHandler
 
+import os
 
+#TODO: 搞定vector_db
 class ChatBot:
 
     def __init__(
         self,
-        bedrock_credential:str,
-        vector_db:str,
+        config:Config,
+        VectorDBHandler:S3SyncVectorDBHandler,
+        LLM:AWSBedRockLLM,
     ) -> None:
-        pass
-        # ================= Authenticator for AWS =================
-        self.authenticate(bedrock_credential=bedrock_credential)
+        self.config = config
+        self.llm = LLM
 
+        self.s3_vector_path = os.path.basename(config.vector_folder_path) +'/'
+        self.folder
+
+        
+        
+        
+        
+        
         # ================= Basic chain components =================
         self._load_vector_store(vector_db=vector_db)
         self._load_memory()
         self._load_prompt()
 
 
-    def authenticate(
-        self, 
-        bedrock_credential
-    )-> None:
-        try:
-            # Attempt AWS authentication using the provided credential profile
-            boto3.Session(profile_name=bedrock_credential)
-        except botocore.exceptions.ProfileNotFound as e:
-            raise  Exception("An error occurred while connecting to AWS") from e
-        
-        try:
-            self.embeddings = BedrockEmbeddings(
-                    credentials_profile_name=bedrock_credential, region_name="us-west-2"
-                )
-        except Exception as e:
-            raise Exception("An error occurred while initializing BedrockEmbeddings") from e
-
-        try:
-            bedrock_runtime = boto3.client(
-                    service_name="bedrock-runtime",
-                    region_name="us-west-2",
-                )
-            from langchain.chat_models import BedrockChat
-            self.titan_llm = BedrockChat(
-                model_id="anthropic.claude-v2", 
-                client=bedrock_runtime, 
-                credentials_profile_name=bedrock_credential
-            )
-            self.titan_llm.model_kwargs = {"temperature": 0,'max_tokens_to_sample':700}
-        except Exception as e:
-            raise Exception("An error occurred while initializing Bedrock LLM") from e
+    
+    #TODO: Change to ConversationRetrievalQA
+    #TODO: Think about async
+    def form_chain(self) -> RetrievalQA:
+        chain_type_kwargs = {"prompt": self.prompt,"memory":self.memory}
+        qa_chain = RetrievalQA.from_chain_type(llm=self.titan_llm, 
+                                        chain_type="stuff", 
+                                        retriever=self.vector_store.as_retriever(search_kwargs={"k": 5}),
+                                        verbose=True,
+                                        return_source_documents=True,
+                                        chain_type_kwargs=chain_type_kwargs)
+        return qa_chain
     
     #TODO:new feature like cross vectordb
     def _load_vector_store(
@@ -94,14 +89,3 @@ class ChatBot:
                         k=3
         )
         
-    #TODO: Change to ConversationRetrievalQA
-    #TODO: Think about async
-    def form_chain(self) -> RetrievalQA:
-        chain_type_kwargs = {"prompt": self.prompt,"memory":self.memory}
-        qa_chain = RetrievalQA.from_chain_type(llm=self.titan_llm, 
-                                        chain_type="stuff", 
-                                        retriever=self.vector_store.as_retriever(search_kwargs={"k": 5}),
-                                        verbose=True,
-                                        return_source_documents=True,
-                                        chain_type_kwargs=chain_type_kwargs)
-        return qa_chain

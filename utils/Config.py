@@ -32,3 +32,24 @@ class AWSConfig(Config):
     def describe(self):
         for key, value in self._config.items():
             print(f"{key}: {value}")
+
+class ChatConfig(Config):
+    def __init__(
+        self,
+        bedrock_credential=None,
+        s3_credential=None,
+        s3_bucket_name='qaai-pdf',
+        vector_folder_path=None,
+        region_name="us-west-2",
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        self.bedrock_credential = bedrock_credential
+        self.s3_credential = s3_credential
+        self.s3_bucket_name = s3_bucket_name
+        self.vector_folder_path = vector_folder_path
+        self.region_name = region_name
+
+    def describe(self):
+        for key, value in self._config.items():
+            print(f"{key}: {value}")
