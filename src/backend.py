@@ -2,45 +2,36 @@
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import RetrievalQA
-from utils.aws_client import AWSBedRockLLM
+from utils.aws_client import AWSBedRockLLM, AWSBedrockEembedding
 from utils.Config import Config
 from langchain.vectorstores.faiss import FAISS
-from SyncVectorDBHandler import S3SyncVectorDBHandler
+from src.SyncVectorDBHandler import S3SyncVectorDBHandler
 
 import os
 
-#TODO: 搞定vector_db
 class ChatBot:
 
     def __init__(
         self,
         config:Config,
         VectorDBHandler:S3SyncVectorDBHandler,
+        Embeddings:AWSBedrockEembedding,
         LLM:AWSBedRockLLM,
     ) -> None:
         self.config = config
+        self.s3_vector_path = os.path.basename(config.vector_folder_path) +'/'
+        self.vectordb_handler = VectorDBHandler
+        self.embeddings = Embeddings
         self.llm = LLM
 
-        self.s3_vector_path = os.path.basename(config.vector_folder_path) +'/'
-        self.folder
-
-        
-        
-        
-        
-        
-        # ================= Basic chain components =================
-        self._load_vector_store(vector_db=vector_db)
+        self._load_vector_store()
         self._load_memory()
         self._load_prompt()
 
-
-    
     #TODO: Change to ConversationRetrievalQA
-    #TODO: Think about async
     def form_chain(self) -> RetrievalQA:
         chain_type_kwargs = {"prompt": self.prompt,"memory":self.memory}
-        qa_chain = RetrievalQA.from_chain_type(llm=self.titan_llm, 
+        qa_chain = RetrievalQA.from_chain_type(llm=self.llm, 
                                         chain_type="stuff", 
                                         retriever=self.vector_store.as_retriever(search_kwargs={"k": 5}),
                                         verbose=True,
@@ -48,18 +39,12 @@ class ChatBot:
                                         chain_type_kwargs=chain_type_kwargs)
         return qa_chain
     
-    #TODO:new feature like cross vectordb
-    def _load_vector_store(
-        self,
-        vector_db
-    )-> None:
-        #TODO:download files from AWS if not os.path.exist(vector_db)
-
-        if not os.path.exists(vector_db):
-            raise Exception("The vector store is not existed, please check files again.")
+    def _load_vector_store(self)-> None:
+        if not os.path.exists(self.config.vector_folder_path):
+           self.vectordb_handler.sync_from_cloud(s3_prefix=self.s3_vector_path, local_folder=self.config.vector_folder_path)
         
         self.vector_store = FAISS.load_local(
-                                vector_db, self.embeddings
+                                self.config.vector_folder_path, self.embeddings
                             )
 
     #TODO: Think how to make it easier to change-> config.json or config.yaml
@@ -89,3 +74,22 @@ class ChatBot:
                         k=3
         )
         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

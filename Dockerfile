@@ -15,8 +15,7 @@ COPY . ./
 RUN pip install -r requirements.txt
 RUN pip install Flask gunicorn
 
-# Set an environment variable for AWS profile name.
-ENV AWS_PROFILE='user'
+
 # Set the PORT environment variable
 ENV PORT 8080
 EXPOSE 8080

@@ -1,6 +1,11 @@
-from src.backend import (
-    ChatBot,
+from utils.Config import ChatConfig
+from utils.aws_client import (
+    AWSBedRockLLM, 
+    AWSBedrockEembedding, 
+    AWSS3Bucket
 )
+from src.backend import ChatBot
+from src.SyncVectorDBHandler import S3SyncVectorDBHandler
 
 from typing import (
     List,
@@ -11,7 +16,8 @@ import os
 import logging
 logging.basicConfig(level=logging.INFO)
 
-profile = os.environ.get('AWS_PROFILE')
+s3_bucket_profile = os.environ.get('AWS_S3_PROFILE')
+bedrock_profile = os.environ.get('AWS_BEDROCK_PROFILE')
     
 def chat(
     version:str, 
@@ -20,7 +26,8 @@ def chat(
     
     chat_data = {
         'answer':str(),
-        'metadata': List[str]
+        'metadata': List[str],
+        'config':Dict[str, str]
     }
     
     # 1. ================== Random check ==================
@@ -37,34 +44,51 @@ def chat(
     query = payload.get('query','')
     logging.info('Chek payload.............Done')
 
-    # 3. ================== Reply ==================  
-    bot = ChatBot(
-        bedrock_credential=profile,
-        vector_db= vector_db
-    ).form_chain()
+    # 3. ================== Bot Construct ==================  
+    config = ChatConfig(
+            bedrock_credential='bedrock',
+            s3_credential='default',
+            vector_folder_path='./vectorstores'
+    )
+    print(config.describe())
 
+    s3_bucket = AWSS3Bucket(config).connect_to_cloud_storage()
+    embeddings = AWSBedrockEembedding(config).get_embedding_model()
+    llm = AWSBedRockLLM(config).get_llm_model()
+    vectordb_handler = S3SyncVectorDBHandler(aws_s3_bucket=s3_bucket)
+
+    bot = ChatBot(
+        config=config, 
+        VectorDBHandler=vectordb_handler, 
+        Embeddings=embeddings, 
+        LLM=llm).form_chain()
+    
+    # 4. ================== Get Reply ==================
     try:
         reply = bot({"query":query})
     except:
         raise Exception('Something wrong when getting reply')
      
     answer = reply['result']
-    source_documents_info =[doc.metadata for doc in reply['source_documents']]
     
+    #TODO:Deal with this
+    source_documents_info =[doc.metadata for doc in reply['source_documents']]
+
     from collections import defaultdict
     raw_metadata = defaultdict(set)
     for data in source_documents_info:
         document_path = data['source']
         document_name = os.path.basename(document_path)
-        raw_metadata[document_name].add(f"P.{int(data['page'])+1}")
+        raw_metadata[document_name].add(f"page.{int(data['page'])+1}")
+    
+    first_metadata, pages = next(iter(dict(raw_metadata).items()))
 
     metadata = "------------------------------------\n參考資料:\n"
-    for index,(file_name,pages) in enumerate(raw_metadata.items()):
-        metadata += f"{index+1}. {file_name} , page:{pages}\n------------------------------------\n" 
+    metadata += f" {first_metadata},\n Page: {', '.join(pages)}\n------------------------------------\n" 
 
     chat_data['answer'] = answer
-    chat_data['metadata'] = metadata.replace('{', '').replace('}', '').replace("'", '')
-    
+    chat_data['metadata'] = metadata
+    chat_data['config'] = config.describe()
     
     return chat_data
 

@@ -1,9 +1,8 @@
 # venv, .env
 .env
 venv
-venv_ubuntu
 # document
-documents/
+vectorstores/
 
 #test
 unit_test/

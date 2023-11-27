@@ -30,8 +30,10 @@ class AWSConfig(Config):
         self.region_name = region_name
 
     def describe(self):
+        config = {}
         for key, value in self._config.items():
-            print(f"{key}: {value}")
+            config[key] = value
+        return config
 
 class ChatConfig(Config):
     def __init__(
@@ -51,5 +53,7 @@ class ChatConfig(Config):
         self.region_name = region_name
 
     def describe(self):
+        config = {}
         for key, value in self._config.items():
-            print(f"{key}: {value}")
+            config[key] = value
+        return config

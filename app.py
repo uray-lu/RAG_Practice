@@ -13,7 +13,7 @@ def HEALTH_CHECK():
         'status_msg': 'success'
     }
 
-@app.route('/<string:version>/chat', methods = ['POST'])
+@app.route('/chat/<string:version>', methods = ['POST'])
 def chatbot(version:str = 'v1'):
     from main import chat
     # =================== Default Response ===================
