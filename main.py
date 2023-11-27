@@ -16,8 +16,8 @@ import os
 import logging
 logging.basicConfig(level=logging.INFO)
 
-s3_bucket_profile = os.environ.get('AWS_S3_PROFILE')
-bedrock_profile = os.environ.get('AWS_BEDROCK_PROFILE')
+
+aws_profile = os.environ.get('AWS_PROFILE')
     
 def chat(
     version:str, 
@@ -46,8 +46,8 @@ def chat(
 
     # 3. ================== Bot Construct ==================  
     config = ChatConfig(
-            bedrock_credential=bedrock_profile,
-            s3_credential=s3_bucket_profile,
+            bedrock_credential=aws_profile,
+            s3_credential=aws_profile,
             vector_folder_path='./vectorstores'
     )
     logging.info(
