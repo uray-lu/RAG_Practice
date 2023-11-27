@@ -9,7 +9,7 @@ DOCKER_IMAGE_NAME = gama-chat
 DOCKER_IMAGE_VERSION = 0.0.0
 DOCKER_CONTAINER_NAME = gama-chat-test
 AWS_CONFIG_PATH = $(HOME_DIR)/.aws
-
+AWS_PROFILE = bedrock
 .PHONY: help
 help:
 	@echo "Available targets:"
@@ -25,7 +25,7 @@ build:
 
 # Run the Flask app in a Docker container with .aws volume mount
 run:
-	docker run -d -p 5000:5000 --name $(DOCKER_CONTAINER_NAME) -v $(AWS_CONFIG_PATH):/root/.aws $(DOCKER_IMAGE_NAME)
+	docker run -d -p 5000:5000 --name $(DOCKER_CONTAINER_NAME) -v $(AWS_CONFIG_PATH):/root/.aws -e $(AWS_PROFILE) $(DOCKER_IMAGE_NAME)
 
 # Run unit tests from unit_test.py
 test:
