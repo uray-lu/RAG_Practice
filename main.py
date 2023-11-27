@@ -46,11 +46,13 @@ def chat(
 
     # 3. ================== Bot Construct ==================  
     config = ChatConfig(
-            bedrock_credential='bedrock',
-            s3_credential='default',
+            bedrock_credential=bedrock_profile,
+            s3_credential=s3_bucket_profile,
             vector_folder_path='./vectorstores'
     )
-    print(config.describe())
+    logging.info(
+        f"Config: {config.describe()}"
+    )
 
     s3_bucket = AWSS3Bucket(config).connect_to_cloud_storage()
     embeddings = AWSBedrockEembedding(config).get_embedding_model()

@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 class Config(ABC):
 
     def __init__(self, **kwargs):
-        self._config = kwargs
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     
     @abstractmethod
     def describe(self):
@@ -30,11 +31,8 @@ class AWSConfig(Config):
         self.region_name = region_name
 
     def describe(self):
-        config = {}
-        for key, value in self._config.items():
-            config[key] = value
-        return config
-
+        return self.__dict__
+    
 class ChatConfig(Config):
     def __init__(
         self,
@@ -53,7 +51,5 @@ class ChatConfig(Config):
         self.region_name = region_name
 
     def describe(self):
-        config = {}
-        for key, value in self._config.items():
-            config[key] = value
-        return config
+        return self.__dict__
+    
