@@ -3,7 +3,7 @@
 venv
 # document
 vectorstores/
-
+prompt/
 #test
 unit_test/
 test.py
