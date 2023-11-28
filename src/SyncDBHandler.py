@@ -7,15 +7,14 @@ class SyncError(Exception):
     """Custom exception for synchronization errors."""
     pass
 
-class SyncVectorDB(ABC):
+class SyncDB(ABC):
 
     @abstractmethod
     def sync_from_cloud(self, **kwargs) -> None:
         """Abstract method to sync data from the cloud storage."""
         pass
 
-
-class S3SyncVectorDBHandler(SyncVectorDB):
+class SyncS3DBHandler(SyncDB):
 
     def __init__(self, aws_s3_bucket) -> None:
         self.aws_s3_bucket = aws_s3_bucket
@@ -41,23 +40,3 @@ class S3SyncVectorDBHandler(SyncVectorDB):
                     raise SyncError(f"Error downloading {obj.key}: {e}")
 
         logging.info(f"------------------- Sync from S3: {s3_prefix} to Local: {local_folder}  Done-------------------")
-
-
-#%%
-# from utils.Config import ChatConfig
-# from utils.aws_client import AWSS3Bucket
-# config = ChatConfig(
-#     bedrock_credential="bedrock",
-#     s3_credential="default"
-# )
-
-# s3_bucket = AWSS3Bucket(config=config).connect_to_cloud_storage()
-
-
-
-
-# # %%
-# SyncVectorDBHandler(aws_s3_bucket=s3_bucket).sync_from_cloud(
-#     s3_prefix='vectorstores/',
-#     local_folder='C://Users/raylu/Desktop/GTW-RAG-ChatBot/v')
-# %%

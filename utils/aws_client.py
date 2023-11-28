@@ -1,4 +1,3 @@
-#%%
 from abc import ABC, abstractmethod
 import boto3
 import botocore
@@ -44,7 +43,7 @@ class AWSBedrockEembedding(AWSClient, CloudEmbeddingModel):
     def authenticate(self) -> None:
         try:
             # Attempt AWS authentication using the provided credential profile
-            self.session = boto3.Session(profile_name=self.config.bedrock_credential)
+            self.session = boto3.Session(profile_name=self.config.aws_credential)
         except botocore.exceptions.ProfileNotFound as e:
             raise  Exception("An error occurred while connecting to AWS") from e
 
@@ -56,7 +55,7 @@ class AWSBedrockEembedding(AWSClient, CloudEmbeddingModel):
         try:
             # Attempt to create a BedrockEmbeddings object
             embeddings = BedrockEmbeddings(
-                credentials_profile_name=self.config.bedrock_credential, region_name=self.config.region_name,
+                credentials_profile_name=self.config.aws_credential, region_name=self.config.region_name,
             )
         except Exception as e:
             raise Exception("An error occurred while initializing BedrockEmbeddings") from e
@@ -72,7 +71,7 @@ class AWSS3Bucket(AWSClient, CloudStorage):
     def authenticate(self) -> None:
         try:
             # Attempt AWS authentication using the provided credential profile
-            self.session = boto3.Session(profile_name=self.config.s3_credential)
+            self.session = boto3.Session(profile_name=self.config.aws_credential)
         except botocore.exceptions.ProfileNotFound as e:
             raise  Exception("An error occurred while connecting to AWS") from e
 
@@ -97,7 +96,7 @@ class AWSBedRockLLM(AWSClient, CloudLLMModel):
     def authenticate(self) -> None:
         try:
             # Attempt AWS authentication using the provided credential profile
-            self.session = boto3.Session(profile_name=self.config.bedrock_credential)
+            self.session = boto3.Session(profile_name=self.config.aws_credential)
         except botocore.exceptions.ProfileNotFound as e:
             raise  Exception("An error occurred while connecting to AWS") from e
 
@@ -113,54 +112,10 @@ class AWSBedRockLLM(AWSClient, CloudLLMModel):
             llm = BedrockChat(
                 model_id="anthropic.claude-v2", 
                 client=bedrock_runtime, 
-                credentials_profile_name=self.config.bedrock_credential
+                credentials_profile_name=self.config.aws_credential
             )
             llm.model_kwargs = {"temperature": 0,'max_tokens_to_sample':700}
         except Exception as e:
             raise Exception("An error occurred while initializing Bedrock LLM") from e
 
         return llm
-
-
-
-
-#%%
-# Test
-
-# from Config import AWSConfig
-
-
-# config = AWSConfig(
-#     bedrock_credential="bedrock",
-#     s3_credential="default"
-# )
-
-
-# s3_bucket = AWSS3Bucket(config)
-# embeddings = AWSBedrockEembedding(config).get_embedding_model()
-
-# from utils.Config import ChatConfig
-
-# config = ChatConfig(
-#     bedrock_credential="bedrock",
-#     s3_credential="default"
-# )
-
-# llm = AWSBedRockLLM(config).get_llm_model()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-# %%
