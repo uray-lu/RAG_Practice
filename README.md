@@ -3,7 +3,7 @@
 
 GTW-RAG-ChatBot is a Flask-based application that hosts a chatbot endpoint to respond to queries using a specified reference in a vector database.
 
-# Outline
+# Table of Content
 
 1. [Endpoint](#endpoint)
 2. [Example Usages](#example-usages)
@@ -30,7 +30,9 @@ The API expects a JSON payload in the request body with the following structure:
 ```json
 {
    "query": "Your question here",
-   "vector_db": "Name of the vector database to reference"
+   "vector_db_path": "Name of the vector database to reference",
+   "prompt_db_path": "Name of the prompt database to reference",
+   "prompt_name":"Name of the prompt to referenc"
 }
 ```
 

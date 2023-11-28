@@ -1,18 +1,13 @@
 # venv, .env
-
 .env
 venv
-
-
-
 # document
-documents
-vectorstores
-
+vectorstores/
+prompt/
 #test
-playground.py
+unit_test/
 test.py
-
+playground.py
 
 # cache
-__pycache__
+**/__pycache__/

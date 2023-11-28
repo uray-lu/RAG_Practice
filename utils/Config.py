@@ -9,45 +9,24 @@ class Config(ABC):
     @abstractmethod
     def describe(self):
         pass
-
-
-class AWSConfig(Config):
-    def __init__(
-        self,
-        bedrock_credential=None,
-        s3_credential=None,
-        s3_bucket_name='qaai-pdf',
-        source_folder_path=None,
-        vector_folder_path=None,
-        region_name="us-west-2",
-        **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.bedrock_credential = bedrock_credential
-        self.s3_credential = s3_credential
-        self.s3_bucket_name = s3_bucket_name
-        self.source_folder_path = source_folder_path
-        self.vector_folder_path = vector_folder_path
-        self.region_name = region_name
-
-    def describe(self):
-        return self.__dict__
     
 class ChatConfig(Config):
     def __init__(
         self,
-        bedrock_credential=None,
-        s3_credential=None,
+        aws_credential=None,
         s3_bucket_name='qaai-pdf',
-        vector_folder_path=None,
+        vector_db_path=None,
+        prompt_db_path=None,
+        prompt_name=None,
         region_name="us-west-2",
         **kwargs
     ):
         super().__init__(**kwargs)
-        self.bedrock_credential = bedrock_credential
-        self.s3_credential = s3_credential
+        self.aws_credential =aws_credential
         self.s3_bucket_name = s3_bucket_name
-        self.vector_folder_path = vector_folder_path
+        self.vector_db_path = vector_db_path
+        self.prompt_db_path = prompt_db_path
+        self.prompt_name = prompt_name
         self.region_name = region_name
 
     def describe(self):

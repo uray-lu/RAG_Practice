@@ -5,7 +5,7 @@ from utils.aws_client import (
     AWSS3Bucket
 )
 from src.backend import ChatBot
-from src.SyncVectorDBHandler import S3SyncVectorDBHandler
+from src.SyncDBHandler import SyncS3DBHandler
 
 from typing import (
     List,
@@ -37,18 +37,28 @@ def chat(
     # 2. ================== Check payload ==================
     logging.info('Chek payload.............start')
     
-    vector_db = payload.get('vector_db', None)
-    if not vector_db:
+    vector_db_path = payload.get('vector_db_path', None)
+    if not vector_db_path:
         raise Exception('Vector DB is not set, please check the request body.')
-
+    
+    prompt_db_path = payload.get('prompt_db_path', None)
+    if not prompt_db_path:
+        raise Exception('Prompt DB is not set, please check the request body.')
+    
+    prompt_name = payload.get('prompt_name', None)
+    if not prompt_name:
+        raise Exception('Prompt name is not set, please check the request body.')
+    
     query = payload.get('query','')
+    
     logging.info('Chek payload.............Done')
 
     # 3. ================== Bot Construct ==================  
     config = ChatConfig(
-            bedrock_credential=aws_profile,
-            s3_credential=aws_profile,
-            vector_folder_path='./vectorstores'
+            aws_credential=aws_profile,
+            vector_db_path=vector_db_path,
+            prompt_db_path=prompt_db_path,
+            prompt_name=prompt_name
     )
     logging.info(
         f"Config: {config.describe()}"
@@ -57,11 +67,11 @@ def chat(
     s3_bucket = AWSS3Bucket(config).connect_to_cloud_storage()
     embeddings = AWSBedrockEembedding(config).get_embedding_model()
     llm = AWSBedRockLLM(config).get_llm_model()
-    vectordb_handler = S3SyncVectorDBHandler(aws_s3_bucket=s3_bucket)
+    db_handler = SyncS3DBHandler(aws_s3_bucket=s3_bucket)
 
     bot = ChatBot(
         config=config, 
-        VectorDBHandler=vectordb_handler, 
+        DBHandler=db_handler, 
         Embeddings=embeddings, 
         LLM=llm).form_chain()
     

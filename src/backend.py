@@ -5,7 +5,7 @@ from langchain.chains import RetrievalQA
 from utils.aws_client import AWSBedRockLLM, AWSBedrockEembedding
 from utils.Config import Config
 from langchain.vectorstores.faiss import FAISS
-from src.SyncVectorDBHandler import S3SyncVectorDBHandler
+from src.SyncDBHandler import SyncS3DBHandler
 
 import os
 
@@ -14,13 +14,14 @@ class ChatBot:
     def __init__(
         self,
         config:Config,
-        VectorDBHandler:S3SyncVectorDBHandler,
+        DBHandler:SyncS3DBHandler,
         Embeddings:AWSBedrockEembedding,
         LLM:AWSBedRockLLM,
     ) -> None:
         self.config = config
-        self.s3_vector_path = os.path.basename(config.vector_folder_path) +'/'
-        self.vectordb_handler = VectorDBHandler
+        self.remote_vector_db_path = os.path.basename(config.vector_db_path) +'/'
+        self.remote_prompt_db_path = os.path.basename(config.prompt_db_path) +'/'
+        self.db_handler = DBHandler
         self.embeddings = Embeddings
         self.llm = LLM
 
@@ -40,27 +41,19 @@ class ChatBot:
         return qa_chain
     
     def _load_vector_store(self)-> None:
-        if not os.path.exists(self.config.vector_folder_path):
-           self.vectordb_handler.sync_from_cloud(s3_prefix=self.s3_vector_path, local_folder=self.config.vector_folder_path)
+        if not os.path.exists(self.config.vector_db_path):
+           self.db_handler.sync_from_cloud(s3_prefix=self.remote_vector_db_path, local_folder=self.config.vector_db_path)
         
         self.vector_store = FAISS.load_local(
-                                self.config.vector_folder_path, self.embeddings
+                                self.config.vector_db_path, self.embeddings
                             )
 
-    #TODO: Think how to make it easier to change-> config.json or config.yaml
     def _load_prompt(self) -> None:
-        prompt_template = """
-        You are a helpful chatbot only speak Traditional Chinese and having a conversation with user.
-        Use the following information to make a recap to answer the question at the end. If you don't know the answer, 
-        just say that you don't know and ask the user for more informations, don't try to make up an answer.
+        if not os.path.exists(self.config.prompt_db_path):
+            self.db_handler.sync_from_cloud(s3_prefix=self.remote_prompt_db_path, local_folder=self.config.prompt_db_path)
         
-        Context:{context}
-        
-        History: {chat_history}
-        
-        Question: {question}
-        Answer (Must in Traditional Chinese(繁體中文)):
-        """
+        with open(os.path.join(self.config.prompt_db_path, self.config.prompt_name), 'r', encoding='utf-8') as file:
+            prompt_template = file.read()
         self.prompt = PromptTemplate(
             template=prompt_template, input_variables=["chat_history","context","question"]
         )
