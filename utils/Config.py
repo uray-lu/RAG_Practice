@@ -13,7 +13,6 @@ class Config(ABC):
 class ChatConfig(Config):
     def __init__(
         self,
-        aws_credential=None,
         s3_bucket_name='qaai-pdf',
         vector_db_path=None,
         prompt_db_path=None,
@@ -22,7 +21,6 @@ class ChatConfig(Config):
         **kwargs
     ):
         super().__init__(**kwargs)
-        self.aws_credential =aws_credential
         self.s3_bucket_name = s3_bucket_name
         self.vector_db_path = vector_db_path
         self.prompt_db_path = prompt_db_path
