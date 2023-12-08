@@ -1,17 +1,15 @@
 import logging
 logging.basicConfig(level=logging.INFO)
-import json
-from utils import JsonEncoder
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 @app.route('/', methods = ['GET','POST'])
 def HEALTH_CHECK():
-    return {
+    return jsonify({
         'status_code': 200,
         'status_msg': 'success'
-    }
+    })
 
 @app.route('/chat/<string:version>', methods = ['POST'])
 def chatbot(version:str = 'v1'):
@@ -44,13 +42,8 @@ def chatbot(version:str = 'v1'):
     else:
         response["status_code"] = 405
         response["status_msg"] = 'Method Not Allowed'
-    # =================== Make Response =======================
-    status = response.get("status_code")
-    json_response = json.dumps(obj = response, 
-        cls=JsonEncoder, ensure_ascii=False, indent=4)
-    headers = {'Content-Type': 'application/json; charset=utf-8'}
     
-    return json_response, status, headers
+    return jsonify(response)
 
 
     
