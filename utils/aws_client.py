@@ -6,11 +6,17 @@ from langchain.chat_models import BedrockChat
 from utils.Config import Config
 
 class AWSClient(ABC):
+    def __init__(self, config):
+        self.config = config
+        self.session = None
 
-    @abstractmethod
-    def authenticate(self, bedrock_credential)-> None:
-        """Authenticate AWS client using provided credentials."""
-        pass
+    def authenticate(self):
+        if self.session is None:
+            try:
+                # Attempt AWS authentication using the provided credential profile
+                self.session = boto3.Session()
+            except botocore.exceptions.ProfileNotFound as e:
+                raise Exception("An error occurred while connecting to AWS") from e
 
 class CloudEmbeddingModel(ABC):
     
@@ -35,27 +41,14 @@ class CloudLLMModel(ABC):
 
 
 class AWSBedrockEembedding(AWSClient, CloudEmbeddingModel):
-    
-    def __init__(self, config:Config)-> None:
-        self.config = config
-        self.session = None
-
-    def authenticate(self) -> None:
-        try:
-            # Attempt AWS authentication using the provided credential profile
-            self.session = boto3.Session(profile_name=self.config.aws_credential)
-        except botocore.exceptions.ProfileNotFound as e:
-            raise  Exception("An error occurred while connecting to AWS") from e
-
-    
     def get_embedding_model(self)-> BedrockEmbeddings:      
-        if not self.session:
-            self.authenticate()
-
+        self.authenticate()
         try:
             # Attempt to create a BedrockEmbeddings object
-            embeddings = BedrockEmbeddings(
-                credentials_profile_name=self.config.aws_credential, region_name=self.config.region_name,
+            embeddings = BedrockEmbeddings(client=self.session.client(
+                    service_name="bedrock-runtime",
+                    region_name="us-west-2",
+                )
             )
         except Exception as e:
             raise Exception("An error occurred while initializing BedrockEmbeddings") from e
@@ -63,22 +56,8 @@ class AWSBedrockEembedding(AWSClient, CloudEmbeddingModel):
         return embeddings
 
 class AWSS3Bucket(AWSClient, CloudStorage):
-
-    def __init__(self, config:Config)-> None:
-        self.config = config
-        self.session = None
-
-    def authenticate(self) -> None:
-        try:
-            # Attempt AWS authentication using the provided credential profile
-            self.session = boto3.Session(profile_name=self.config.aws_credential)
-        except botocore.exceptions.ProfileNotFound as e:
-            raise  Exception("An error occurred while connecting to AWS") from e
-
     def connect_to_cloud_storage(self) -> any:
-        if not self.session:
-            self.authenticate()
-
+        self.authenticate()
         try:
             s3 = self.session.resource('s3')
             bucket = s3.Bucket(self.config.s3_bucket_name)
@@ -88,31 +67,17 @@ class AWSS3Bucket(AWSClient, CloudStorage):
         return bucket
 
 class AWSBedRockLLM(AWSClient, CloudLLMModel):
-    
-    def __init__(self, config:Config)-> None:
-        self.config = config
-        self.session = None
-
-    def authenticate(self) -> None:
-        try:
-            # Attempt AWS authentication using the provided credential profile
-            self.session = boto3.Session(profile_name=self.config.aws_credential)
-        except botocore.exceptions.ProfileNotFound as e:
-            raise  Exception("An error occurred while connecting to AWS") from e
-
     def get_llm_model(self) -> any:
         if not self.session:
             self.authenticate()
         
         try:
-            bedrock_runtime = boto3.client(
+            llm = BedrockChat(
+                client=self.session.client(
                     service_name="bedrock-runtime",
                     region_name="us-west-2",
-                )
-            llm = BedrockChat(
-                model_id="anthropic.claude-v2", 
-                client=bedrock_runtime, 
-                credentials_profile_name=self.config.aws_credential
+                ),
+                model_id="anthropic.claude-v2" 
             )
             llm.model_kwargs = {"temperature": 0,'max_tokens_to_sample':700}
         except Exception as e:
