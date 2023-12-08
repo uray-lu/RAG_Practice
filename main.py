@@ -16,8 +16,6 @@ import os
 import logging
 logging.basicConfig(level=logging.INFO)
 
-
-aws_profile = os.environ.get('AWS_PROFILE')
     
 def chat(
     version:str, 
@@ -55,7 +53,6 @@ def chat(
 
     # 3. ================== Bot Construct ==================  
     config = ChatConfig(
-            aws_credential=aws_profile,
             vector_db_path=vector_db_path,
             prompt_db_path=prompt_db_path,
             prompt_name=prompt_name
