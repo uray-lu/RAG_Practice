@@ -34,3 +34,21 @@ class ChatConfig(Config):
     def describe(self):
         return self.__dict__
     
+class TrulensConfig(Config):
+    """save Trulens Config"""
+    def __init__(self):
+        self.methods = ['groundness', 'context_relevancy', 'answer_relevancy']
+
+    def describe(self):
+        return self.__dict__
+
+class RagasConfig(Config):
+    """save Ragas Config"""
+    def __init__(self):
+        self.methods = ['context_precision']
+
+    def describe(self):
+        return self.__dict__
+
+trulens_config = TrulensConfig()
+ragas_config = RagasConfig()
