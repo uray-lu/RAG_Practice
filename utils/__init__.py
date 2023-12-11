@@ -1,4 +1,5 @@
 import json
+import os
 
 class JsonEncoder(json.JSONEncoder):
     
@@ -20,3 +21,12 @@ class JsonLoader:
         with open(file_path, 'w', encoding="utf-8") as file:
             json.dump(data, file)
 
+
+class CsvService:
+    """handle csv function"""
+    @staticmethod
+    def is_csv_file(file_path: str) -> bool:
+        """determine csv file"""
+        _, file_ext = os.path.splitext(file_path)
+
+        return file_ext.lower() == '.csv'
