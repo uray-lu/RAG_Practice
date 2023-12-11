@@ -11,5 +11,6 @@ playground.py
 RAG_eval_data_60.csv
 RAG_retriever_eval_60/
 processing_checkpoint.json
+Retrieval_eval_vectorstores/
 # cache
 **/__pycache__/
