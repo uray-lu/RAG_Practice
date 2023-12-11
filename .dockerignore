@@ -8,7 +8,10 @@ prompt/
 unit_test/
 test.py
 playground.py
-
+RAG_eval_data_60.csv
+RAG_retriever_eval_60/
+retriever_eval.ipynb
+processing_checkpoint.json
 # cache
 **/__pycache__/
 

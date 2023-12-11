@@ -13,11 +13,13 @@ class Config(ABC):
 class ChatConfig(Config):
     def __init__(
         self,
-        s3_bucket_name='qaai-pdf',
-        vector_db_path=None,
-        prompt_db_path=None,
-        prompt_name=None,
-        region_name="us-west-2",
+        s3_bucket_name:str='qaai-pdf',
+        vector_db_path:str=None,
+        prompt_db_path:str=None,
+        prompt_name:str=None,
+        retriever_topk:int=5,
+        retriever_threshold:float=None,
+        region_name:str="us-west-2",
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -25,6 +27,8 @@ class ChatConfig(Config):
         self.vector_db_path = vector_db_path
         self.prompt_db_path = prompt_db_path
         self.prompt_name = prompt_name
+        self.retriever_topk = retriever_topk
+        self.retriever_threshold = retriever_threshold
         self.region_name = region_name
 
     def describe(self):
