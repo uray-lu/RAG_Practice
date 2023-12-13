@@ -40,9 +40,9 @@ def process_trulens_service(tru_service: TrulensManager, eval_data, methods: str
 
     for _, row in eval_data.iterrows():
         data_dict = {
-            'question': row['question'], 
-            'context': row['context'], 
-            'answer': row['answer']
+            'question': row['question'] if 'question' in row else '', 
+            'context': row['context']  if 'context' in row else '', 
+            'answer': row['answer'] if 'answer' in row else ''
             }
         tru_res = tru_service.evaluate({
             'choice_list': methods, 

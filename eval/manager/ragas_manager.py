@@ -24,7 +24,7 @@ class RagasManager(EvalBase):
         res_dict = {}
         for choice in choice_list:
             if choice == 'context_precision':
-                self._validate_params(eval_df, ['contexts', 'answer'], 'context_precision')
+                self._validate_params(eval_df, ['contexts', 'question'], 'context_precision')
                 eval_df['contexts'] = eval_df['contexts'].apply(lambda x: ast.literal_eval(x))
                 eval_dataset = Dataset.from_pandas(eval_df)
                 res_dict['context_precision'] = self._evaluate_method(
