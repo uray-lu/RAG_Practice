@@ -1,4 +1,4 @@
-
+from abc import ABC, abstractmethod
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import RetrievalQA
@@ -11,7 +11,14 @@ import os
 import logging
 logging.basicConfig(level=logging.INFO)
 
-class ChatBot:
+class BaseChainConstructor(ABC):
+
+    @abstractmethod
+    def form_chain(self) -> RetrievalQA:
+        """Abstract method to form the chain."""
+
+
+class RetrieverChainConstructor(BaseChainConstructor):
 
     def __init__(
         self,
@@ -29,14 +36,14 @@ class ChatBot:
 
         self._load_memory()
         self._load_prompt()
-        self._load_vector_store()        
+        self._load_vector_store()
+        self._get_retriever()        
 
-    #TODO: Change to ConversationRetrievalQA
     def form_chain(self) -> RetrievalQA:
         chain_type_kwargs = {"prompt": self.prompt,"memory":self.memory}
         qa_chain = RetrievalQA.from_chain_type(llm=self.llm, 
                                         chain_type="stuff", 
-                                        retriever=self._get_retriever(),
+                                        retriever=self.retriever,
                                         verbose=True,
                                         return_source_documents=True,
                                         chain_type_kwargs=chain_type_kwargs)
@@ -68,17 +75,15 @@ class ChatBot:
            self.db_handler.sync_from_cloud(s3_prefix=self.remote_vector_db_path, local_folder=self.config.vector_db_path)
         
         self.vector_store = FAISS.load_local(
-                                self.config.vector_db_path, self.embeddings
+                                self.config.vector_db_path, self.embeddings, normalize_L2=True
                             )
         logging.info(f"With vector Store: {self.config.vector_db_path}")
 
     def _get_retriever(self) -> None:
         if self.config.retriever_threshold:
-            retriever = self.vector_store.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": self.config.retriever_threshold})
+            self.retriever = self.vector_store.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": self.config.retriever_threshold})
         else:
-            retriever = self.vector_store.as_retriever(search_kwargs={"k": self.config.retriever_topk})
-
-        return retriever
+            self.retriever = self.vector_store.as_retriever(search_kwargs={"k": self.config.retriever_topk})
 
 
 

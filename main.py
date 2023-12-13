@@ -4,7 +4,9 @@ from utils.aws_client import (
     AWSBedrockEembedding, 
     AWSS3Bucket
 )
-from src.backend import ChatBot
+
+from src.ChainConstructor import RetrieverChainConstructor
+from src.ChatBot import ChatBot
 from src.SyncDBHandler import SyncS3DBHandler
 
 from typing import (
@@ -51,11 +53,12 @@ def chat(
     
     logging.info('Chek payload.............Done')
 
-    # 3. ================== Bot Construct ==================  
+    # 3. ================== Chain Construction ==================  
     config = ChatConfig(
             vector_db_path=vector_db_path,
             prompt_db_path=prompt_db_path,
-            prompt_name=prompt_name
+            prompt_name=prompt_name,
+            retriever_threshold=.5,
     )
     logging.info(
         f"Config: {config.describe()}"
@@ -66,34 +69,16 @@ def chat(
     llm = AWSBedRockLLM(config).get_llm_model()
     db_handler = SyncS3DBHandler(aws_s3_bucket=s3_bucket)
 
-    bot = ChatBot(
+    chain_constructor = RetrieverChainConstructor(
         config=config, 
         DBHandler=db_handler, 
         Embeddings=embeddings, 
-        LLM=llm).form_chain()
-    
-    # 4. ================== Get Reply ==================
-    try:
-        reply = bot({"query":query})
-    except:
-        raise Exception('Something wrong when getting reply')
-     
-    answer = reply['result']
-    
-    #TODO:Deal with this
-    source_documents_info =[doc.metadata for doc in reply['source_documents']]
+        LLM=llm
+    )
 
-    from collections import defaultdict
-    raw_metadata = defaultdict(set)
-    for data in source_documents_info:
-        document_path = data['source']
-        document_name = os.path.basename(document_path)
-        raw_metadata[document_name].add(f"page.{int(data['page'])+1}")
-    
-    first_metadata, pages = next(iter(dict(raw_metadata).items()))
-
-    metadata = "------------------------------------\n參考資料:\n"
-    metadata += f" {first_metadata},\n Page: {', '.join(pages)}\n------------------------------------\n" 
+     # 4. ================== Get Reply ==================
+    bot = ChatBot(query=query, chain_constructor=chain_constructor)
+    answer, metadata = bot.make_response()
 
     chat_data['answer'] = answer
     chat_data['metadata'] = metadata
