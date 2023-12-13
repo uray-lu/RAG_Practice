@@ -50,33 +50,47 @@ class TrulensManager(EvalBase):
 
     def _groundness(self, data_dict: dict) -> dict:
 
-        res = self._grounded.groundedness_measure_with_cot_reasons(
-            data_dict['context'], data_dict['answer']
-        )
+        try:
+            res = self._grounded.groundedness_measure_with_cot_reasons(
+                data_dict['context'], data_dict['answer']
+            )
 
-        return {
-            'score': self._grounded.grounded_statements_aggregator(res[0]),
-            'reason': res[1]['reason']
-        }
+            return {
+                'score': self._grounded.grounded_statements_aggregator(res[0]),
+                'reason': res[1]['reason']
+            }
+        except Exception as e:
+            raise ValueError(
+                f"answer: {data_dict['answer']} and context: {data_dict['context']} call groundness error: "
+            ) from e
 
     def _context_relevancy(self, data_dict: dict) -> dict:
 
-        res = self._openai_provider.qs_relevance_with_cot_reasons(
-            data_dict['question'], data_dict['context']
-        )
-
-        return {
-            'score': res[0],
-            'reason': res[1]['reason']
-        }
+        try:
+            res = self._openai_provider.qs_relevance_with_cot_reasons(
+                data_dict['question'], data_dict['context']
+            )
+            return {
+                'score': res[0],
+                'reason': res[1]['reason']
+            }
+        except Exception as e:
+            raise ValueError(
+                f"question: {data_dict['question']} and context: {data_dict['context']} call context_relevancy error: "
+            ) from e
 
     def _answer_relevancy(self, data_dict: dict) -> dict:
 
-        res = self._openai_provider.relevance_with_cot_reasons(
-            data_dict['question'], data_dict['answer']
-        )
+        try:
+            res = self._openai_provider.relevance_with_cot_reasons(
+                data_dict['question'], data_dict['answer']
+            )
 
-        return {
-            'score': res[0],
-            'reason': res[1]['reason']
-        }
+            return {
+                'score': res[0],
+                'reason': res[1]['reason']
+            }
+        except Exception as e:
+            raise ValueError(
+                f"question: {data_dict['question']} and answer: {data_dict['answer']} call answer_relevancy error: "
+            ) from e
