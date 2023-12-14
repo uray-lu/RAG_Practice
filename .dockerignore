@@ -12,6 +12,7 @@ RAG_eval_data_60.csv
 RAG_retriever_eval_60/
 retriever_eval.ipynb
 processing_checkpoint.json
+Retrieval_eval_vectorstores/
 # cache
 **/__pycache__/
 
