@@ -1,0 +1,49 @@
+utils.aws_client:
+  log_file: "access.log"
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  maxBytes: 104857600  # 100 MB
+  backupCount: 20
+
+boto3:
+  log_file: "access.log"
+  level: "DEBUG"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  maxBytes: 104857600  # 100 MB
+  backupCount: 20
+
+src.ChatBot:
+  log_file: "access.log"
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  maxBytes: 104857600  # 100 MB
+  backupCount: 20
+
+src.ChainConstructor:
+  log_file: "access.log"
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  maxBytes: 104857600  # 100 MB
+  backupCount: 20
+
+src.SyncDBHandler:
+  log_file: "access.log"
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  maxBytes: 104857600  # 100 MB
+  backupCount: 20
+
+backend:
+  log_file: "access.log"
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  maxBytes: 104857600  # 100 MB
+  backupCount: 20
+
+__main__:
+  log_file: "access.log"
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  maxBytes: 104857600
+  backupCount: 20
+

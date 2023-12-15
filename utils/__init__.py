@@ -1,5 +1,8 @@
 import json
 import os
+import logging
+from logging.handlers import RotatingFileHandler
+import yaml
 
 class JsonEncoder(json.JSONEncoder):
     
@@ -30,3 +33,44 @@ class CsvService:
         _, file_ext = os.path.splitext(file_path)
 
         return file_ext.lower() == '.csv'
+
+class Logger:
+    # Load logger configuration from a YAML file
+    with open('./utils/logger_config.yaml', 'r') as file:
+        config = yaml.safe_load(file)
+
+    @classmethod
+    def setup_logger(cls, name):
+        """Set up and return a logger with the name provided."""
+        log_config = cls.config.get(name, {})
+        if not log_config:
+            raise ValueError(f"No logger configuration found for '{name}'")
+        log_file = log_config.get('log_file', 'default.log')
+        level = log_config.get('level', logging.INFO)
+        format = log_config.get('format', '%(asctime)s - %(levelname)s - %(message)s')
+        
+        formatter = logging.Formatter(format)
+        handler = RotatingFileHandler(
+            log_file, 
+            maxBytes=log_config.get('maxBytes', 1024 * 1024 * 100), 
+            backupCount=log_config.get('backupCount', 20)
+        )
+        handler.setFormatter(formatter)
+
+        logger = logging.getLogger(name)
+        logger.setLevel(level)
+        logger.addHandler(handler)
+
+        return logger
+    
+    #TODO: migration to cloud watch
+    # import watchtower
+    # def setup_logger(cls, name):
+    #     logger = logging.getLogger(name)
+    #     logger.setLevel(logging.INFO)
+
+    #     # Create a CloudWatch handler
+    #     cw_handler = watchtower.CloudWatchLogHandler()
+    #     logger.addHandler(cw_handler)
+
+    #     return logger
