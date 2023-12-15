@@ -8,8 +8,8 @@ from langchain.vectorstores.faiss import FAISS
 from src.SyncDBHandler import SyncS3DBHandler
 
 import os
-import logging
-logging.basicConfig(level=logging.INFO)
+from utils import Logger
+logger = Logger.setup_logger(__name__)
 
 class BaseChainConstructor(ABC):
 
@@ -47,6 +47,7 @@ class RetrieverChainConstructor(BaseChainConstructor):
                                         verbose=True,
                                         return_source_documents=True,
                                         chain_type_kwargs=chain_type_kwargs)
+        logger.info(f"QA Chain Construct.............Done")
         return qa_chain
 
     def _load_prompt(self) -> None:
@@ -59,7 +60,7 @@ class RetrieverChainConstructor(BaseChainConstructor):
         self.prompt = PromptTemplate(
             template=prompt_template, input_variables=["chat_history","context","question"]
         )
-        logging.info(f"With Prompt: {self.config.prompt_name}")
+        logger.info(f"Prompt Construct.............Done")
     
     def _load_memory(self) -> None:
         self.memory =  ConversationBufferMemory(                        
@@ -69,6 +70,7 @@ class RetrieverChainConstructor(BaseChainConstructor):
                         return_messages=True,
                         k=3
         )
+        logger.info(f"Memory Construct.............Done")
 
     def _load_vector_store(self)-> None:
         if not os.path.exists(self.config.vector_db_path):
@@ -77,13 +79,15 @@ class RetrieverChainConstructor(BaseChainConstructor):
         self.vector_store = FAISS.load_local(
                                 self.config.vector_db_path, self.embeddings, normalize_L2=True
                             )
-        logging.info(f"With vector Store: {self.config.vector_db_path}")
+        logger.info(f"Vector Store Construct.............Done")
 
     def _get_retriever(self) -> None:
         if self.config.retriever_threshold:
             self.retriever = self.vector_store.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": self.config.retriever_threshold})
+            logger.info(f"Retriever Construct.............Done")
         else:
             self.retriever = self.vector_store.as_retriever(search_kwargs={"k": self.config.retriever_topk})
+            logger.info(f"Retriever Construct.............Done")
 
 
 

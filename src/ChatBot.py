@@ -1,6 +1,8 @@
 from src.ChainConstructor import BaseChainConstructor
 import os 
 from collections import defaultdict
+from utils import Logger
+logger = Logger.setup_logger(__name__)
 
 class ChatBot:
 
@@ -32,11 +34,13 @@ class ChatBot:
             metadata = "------------------------------------\n參考資料:\n"
             metadata += f" {first_metadata},\n Page: {', '.join(pages)}\n------------------------------------\n" 
             
+            logger.info(f"Make response.............Done")
             return answer, metadata
         else:
             answer = "對不起，根據已我知的資訊，我無法回答您的問題。"
             metadata = "------------------------------------\n參考資料:\n無\n------------------------------------\n" 
             
+            logger.info(f"Make default response.............Done")
             return answer, metadata 
     
     

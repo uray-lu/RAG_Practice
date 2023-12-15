@@ -13,10 +13,8 @@ from typing import (
     List,
     Dict
 )
-
-import os
-import logging
-logging.basicConfig(level=logging.INFO)
+from utils import Logger
+logger = Logger.setup_logger(__name__)
 
     
 def chat(
@@ -35,7 +33,7 @@ def chat(
         raise Exception('Wrong version.')
 
     # 2. ================== Check payload ==================
-    logging.info('Chek payload.............start')
+    logger.info('Chek payload.............start')
     
     vector_db_path = payload.get('vector_db_path', None)
     if not vector_db_path:
@@ -51,7 +49,7 @@ def chat(
     
     query = payload.get('query','')
     
-    logging.info('Chek payload.............Done')
+    logger.info('Chek payload.............Done')
 
     # 3. ================== Chain Construction ==================  
     config = ChatConfig(
@@ -60,7 +58,7 @@ def chat(
             prompt_name=prompt_name,
             retriever_threshold=.5,
     )
-    logging.info(
+    logger.info(
         f"Config: {config.describe()}"
     )
 

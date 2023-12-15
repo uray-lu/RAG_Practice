@@ -1,11 +1,12 @@
-import logging
-logging.basicConfig(level=logging.INFO)
+from utils import Logger
+logger = Logger.setup_logger(__name__)
+from backend import chat
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 @app.route('/', methods = ['GET','POST'])
-def HEALTH_CHECK():
+def health_check():
     return jsonify({
         'status_code': 200,
         'status_msg': 'success'
@@ -13,7 +14,6 @@ def HEALTH_CHECK():
 
 @app.route('/chat/<string:version>', methods = ['POST'])
 def chatbot(version:str = 'v1'):
-    from main import chat
     # =================== Default Response ===================
     response = {
         "status_code" : int(),
@@ -26,23 +26,17 @@ def chatbot(version:str = 'v1'):
     except:
         request_body = dict()
 
-    # ========================= POST =========================
-    if request.method == 'POST':
-        try:
-            response["data_layer"] = chat(version, request_body)
-            response["status_code"] = 200
-            response["status_msg"] = "Success"
-        
-        except Exception as e:
-            err_msg = f"{e}"
-            logging.error(err_msg, exc_info=True)
-            response["status_code"] = 500
-            response["status_msg"] = err_msg
-    # ========================= Other =========================
-    else:
-        response["status_code"] = 405
-        response["status_msg"] = 'Method Not Allowed'
-    
+    try:
+        logger.info(f"----------------------Start To Get Response----------------------")
+        response["data_layer"] = chat(version, request_body)
+        response["status_code"] = 200
+        response["status_msg"] = "Success"
+        logger.info(f"----------------------Successfully GET Response----------------------")
+    except Exception as e:
+        logger.error(str(e), exc_info=True)
+        response["status_code"] = 500
+        response["status_msg"] = str(e)
+
     return jsonify(response)
 
 

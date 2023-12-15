@@ -1,10 +1,14 @@
-# venv, .env
+# Environment settings and virtual environment
 .env
-venv
-# document
+venv/
+
+# Documentation and Data Directories
 vectorstores/
 prompt/
-#test
+
+# Testing files and directories
+eval/
+evaluator.py
 unit_test/
 test.py
 playground.py
@@ -13,10 +17,12 @@ RAG_retriever_eval_60/
 retriever_eval.ipynb
 processing_checkpoint.json
 Retrieval_eval_vectorstores/
-# cache
+*.log
+# Python cache
 **/__pycache__/
 
-# readme 
+# Miscellaneous files
 README.md
-.gitignore
 Makefile
+.gitignore
+.gitattributes
