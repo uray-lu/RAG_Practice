@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import os
-import logging
-logging.basicConfig(level=logging.INFO)
+from utils import Logger
+logger = Logger.setup_logger(__name__)
 
 class SyncError(Exception):
     """Custom exception for synchronization errors."""
@@ -35,8 +35,9 @@ class SyncS3DBHandler(SyncDB):
 
                 try:
                     self.aws_s3_bucket.download_file(obj.key, local_file_path)
-                    print(f"Downloaded {obj.key} to {local_file_path}")
+                    logger.info(f"Downloaded {obj.key} to {local_file_path}")
                 except Exception as e:
+                    logger.error(f"Error downloading {obj.key}: {e}", exc_info=True)
                     raise SyncError(f"Error downloading {obj.key}: {e}")
 
-        logging.info(f"------------------- Sync from S3: {s3_prefix} to Local: {local_folder}  Done-------------------")
+        logger.info(f"Sync from S3: {s3_prefix} to Local: {local_folder} .............Done")
