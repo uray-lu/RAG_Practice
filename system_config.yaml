@@ -1,7 +1,7 @@
 default_version: "v1"
 
 required_chatbot_fields:
-  retriever_threshold: .5
+  retriever_threshold: .3
   retriever_topk: 5
 
 required_db_fields:
