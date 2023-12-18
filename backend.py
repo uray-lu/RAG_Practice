@@ -6,7 +6,8 @@ from utils.aws_client import (
     AWSS3Bucket
 )
 from utils import Logger
-logger = Logger.setup_logger(__name__)
+logger = Logger.setup_logger()
+error_logger = Logger.setup_logger('error')
 
 from src.ChainConstructor import RetrieverChainConstructor
 from src.ChatBot import ChatBot
@@ -17,8 +18,6 @@ from typing import (
     Dict
 )
 
-
-    
 def Backend(
     version:str, 
     payload:dict = {}
@@ -31,6 +30,7 @@ def Backend(
     }
     # 1. ================== Version Check ==================
     if version != SystemConfig.get_default_version():
+        error_logger.error(f'Unsupported version: {version}')
         raise ValueError(f'Unsupported version: {version}')
     # 2. ================== Required fields Check ==================
     db_required_fields = SystemConfig.get_required_db_fields()

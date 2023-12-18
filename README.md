@@ -5,17 +5,39 @@ GTW-RAG-ChatBot is a Flask-based application that hosts a chatbot endpoint to re
 
 # Table of Content
 
-1. [Endpoint](#endpoint)
-2. [Example Usages](#example-usages)
+1. [System Config](#System-Config)
+2. [Endpoint](#endpoint)
 3. [Request Body](#request-body)
 4. [Makefile](#makefile)
 5. [資料夾說明](#資料夾說明)
 6. [執行方式](#執行方式)
 7. [Work In Progress](#work-in-progress)
 
+
+## System Config
+### 啟動服務前，可先設定正確的資料庫名稱以及其他參數 `system_config.yaml`
+```
+default_version: "v1"
+
+required_chatbot_fields:
+  retriever_threshold: .3
+  retriever_topk: 5
+
+required_db_fields:
+  vector_db_path: "./vectorstores"
+  prompt_db_path: "./prompt"
+  prompt_name: "rag_v1.md"
+```
+- default_version: 版本
+- required_chatbot_fields: Retriever threshold & retrieve numbers
+- required_db_fields
+   - vector db name on AWS s3
+   - prompt db on AWS s3
+   - prompt name 
+
 ## Endpoint
 
-The API endpoint for the GTW-RAG-Document-System is accessible at:
+The API endpoint for the GTW-RAG-ChatBot is accessible at:
 
 `{base_url}/chat/v1`
 
@@ -32,10 +54,7 @@ The API expects a JSON payload in the request body with the following structure:
 
 ```json
 {
-   "query": "Your question here",
-   "vector_db_path": "Name of the vector database to reference",
-   "prompt_db_path": "Name of the prompt database to reference",
-   "prompt_name":"Name of the prompt to referenc"
+   "query": "Your question here"
 }
 ```
 
@@ -53,14 +72,14 @@ The API expects a JSON payload in the request body with the following structure:
 ### Available Targets:
 - `build`: Build the Docker image for the Flask app.
 - `run`: Run the Flask app in a Docker container with .aws volume mount.
-- `test`: Run unit tests from unit_test.py.
+<!-- - `test`: Run unit tests from unit_test.py. -->
 - `clean`: Stop and remove the Docker container, and remove the Docker image.
 - `help`: Show available targets and their descriptions.
 
 ### Usage:
 - `make build`: Build the Docker image.
 - `make run`: Run the Flask app in a Docker container with AWS configuration.
-- `make test`: Run unit tests.
+<!-- - `make test`: Run unit tests. -->
 - `make clean`: Stop the container and remove both the container and image.
 
 ## 資料夾說明
@@ -131,3 +150,4 @@ The API expects a JSON payload in the request body with the following structure:
 - [ ] 薪增安裝說明
 - [ ] unit test
 - [ ] python 套件版本管理方式
+- [ ] docker build

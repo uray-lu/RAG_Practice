@@ -2,7 +2,8 @@ from src.ChainConstructor import BaseChainConstructor
 import os 
 from collections import defaultdict
 from utils import Logger
-logger = Logger.setup_logger(__name__)
+logger = Logger.setup_logger()
+error_logger = Logger.setup_logger('error')
 
 class ChatBot:
 

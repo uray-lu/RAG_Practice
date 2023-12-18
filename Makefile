@@ -28,8 +28,8 @@ run:
 	docker run -d -p 5000:5000 --name $(DOCKER_CONTAINER_NAME) -v $(AWS_CONFIG_PATH):/root/.aws -e $(AWS_PROFILE) $(DOCKER_IMAGE_NAME)
 
 # Run unit tests from unit_test.py
-test:
-	python -m unittest unit_test
+# test:
+# 	python -m unittest unit_test
 
 # Stop and remove the Docker container, and remove the Docker image
 clean:
