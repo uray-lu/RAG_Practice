@@ -13,6 +13,7 @@ RAG_retriever_eval_60/
 processing_checkpoint.json
 Retrieval_eval_vectorstores/
 *.log
+LOGS/
 # cache
 **/__pycache__/
 eval/dataset/
