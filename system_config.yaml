@@ -1,0 +1,11 @@
+default_version: "v1"
+
+required_chatbot_fields:
+  retriever_threshold: .5
+  retriever_topk: 5
+
+required_db_fields:
+  vector_db_path: "./vectorstores"
+  prompt_db_path: "./prompt"
+  prompt_name: "rag_v1.md"
+

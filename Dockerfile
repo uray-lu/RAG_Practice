@@ -22,4 +22,4 @@ EXPOSE 8080
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
 # Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
-CMD ["gunicorn", "-b", "0.0.0.0:8080", "-w", "4", "--threads", "2", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080","--access-logfile", "./app/access.log", "app:app"]
