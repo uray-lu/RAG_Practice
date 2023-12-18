@@ -1,6 +1,6 @@
 from utils import Logger
 logger = Logger.setup_logger(__name__)
-from backend import chat
+from backend import Backend
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ def health_check():
     })
 
 @app.route('/chat/<string:version>', methods = ['POST'])
-def chatbot(version:str = 'v1'):
+def chat(version:str = 'v1'):
     # =================== Default Response ===================
     response = {
         "status_code" : int(),
@@ -28,7 +28,7 @@ def chatbot(version:str = 'v1'):
 
     try:
         logger.info(f"----------------------Start To Get Response----------------------")
-        response["data_layer"] = chat(version, request_body)
+        response["data_layer"] = Backend(version, request_body)
         response["status_code"] = 200
         response["status_msg"] = "Success"
         logger.info(f"----------------------Successfully GET Response----------------------")
