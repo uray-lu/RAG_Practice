@@ -1,5 +1,6 @@
 from utils import Logger
-logger = Logger.setup_logger(__name__)
+logger = Logger.setup_logger()
+error_logger = Logger.setup_logger('error')
 from backend import Backend
 from flask import Flask, request, jsonify
 
@@ -33,7 +34,7 @@ def chat(version:str = 'v1'):
         response["status_msg"] = "Success"
         logger.info(f"----------------------Successfully GET Response----------------------")
     except Exception as e:
-        logger.error(str(e), exc_info=True)
+        error_logger.error(str(e), exc_info=True)
         response["status_code"] = 500
         response["status_msg"] = str(e)
 
@@ -42,4 +43,4 @@ def chat(version:str = 'v1'):
 
     
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug =False)

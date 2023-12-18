@@ -4,8 +4,8 @@ import botocore
 from langchain.embeddings import BedrockEmbeddings
 from langchain.chat_models import BedrockChat
 from utils import Logger
-logger = Logger.setup_logger(__name__)
-boto3_logger = Logger.setup_logger('boto3')
+logger = Logger.setup_logger()
+error_logger = Logger.setup_logger('error')
 
 class AWSClient(ABC):
     def __init__(self, config):
@@ -17,7 +17,7 @@ class AWSClient(ABC):
             try:
                 self.session = boto3.Session()
             except botocore.exceptions.ProfileNotFound as e:
-                logger.error("An error occurred while connecting to AWS", exc_info=True)
+                error_logger.error("An error occurred while connecting to AWS", exc_info=True)
                 raise Exception("An error occurred while connecting to AWS") from e
 
 class CloudEmbeddingModel(ABC):
@@ -53,7 +53,7 @@ class AWSBedrockEembedding(AWSClient, CloudEmbeddingModel):
                 )
             )
         except Exception as e:
-            logger.error("An error occurred while initializing BedrockEmbeddings", exc_info=True)
+            error_logger.error("An error occurred while initializing BedrockEmbeddings", exc_info=True)
             raise Exception("An error occurred while initializing BedrockEmbeddings") from e
         
         return embeddings
@@ -65,7 +65,7 @@ class AWSS3Bucket(AWSClient, CloudStorage):
             s3 = self.session.resource('s3')
             bucket = s3.Bucket(self.config.s3_bucket_name)
         except botocore.exceptions.ProfileNotFound as e:
-            logger.error("An error occurred while connecting to AWS S3", exc_info=True)
+            error_logger.error("An error occurred while connecting to AWS S3", exc_info=True)
             raise  Exception("An error occurred while connecting to AWS S3") from e
 
         return bucket
@@ -85,7 +85,7 @@ class AWSBedRockLLM(AWSClient, CloudLLMModel):
             )
             llm.model_kwargs = {"temperature": 0,'max_tokens_to_sample':700}
         except Exception as e:
-            logger.error("An error occurred while initializing Bedrock LLM", exc_info=True)
+            error_logger.error("An error occurred while initializing Bedrock LLM", exc_info=True)
             raise Exception("An error occurred while initializing Bedrock LLM") from e
 
         return llm
