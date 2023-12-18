@@ -54,9 +54,11 @@ class Logger:
             log_config = cls.config.get('info', {})
 
         log_file = log_config.get('log_file', 'default.log')
+        os.makedirs(os.path.dirname(log_file), exist_ok=True)
         level = log_config.get('level', logging.INFO)
         format = log_config.get('format', '%(asctime)s - %(levelname)s - %(message)s')
         
+
         formatter = logging.Formatter(format)
         handler = RotatingFileHandler(
             log_file, 
