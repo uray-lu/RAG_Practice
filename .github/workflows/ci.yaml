@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI Pipelin
 env:
   APP_NAME: 'qaai-system'
   APP_VERSION: '0.1.0'
