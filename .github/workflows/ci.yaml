@@ -1,0 +1,83 @@
+name: CI Pipeline
+env:
+  APP_NAME: 'qaai-system'
+  APP_VERSION: '0.1.0'
+  requirements_file: 'requirements-prod.txt'
+  container_registry_url: '167071742774.dkr.ecr.us-west-2.amazonaws.com'
+  codecommit_repo: 'https://git-codecommit.us-west-2.amazonaws.com/v1/repos/qaai-api'
+
+on:
+  push:
+    branches:
+      - '*'
+
+
+jobs:
+  lint_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Dependencies
+        run: pip install -r ${requirements_file}
+
+      - name: Linting and Code Analysis
+        run: |
+          pip install pylint
+          pylint .  
+          
+      - name: Run Tests
+        run: |
+          pip install pytest 
+          if [ -n "$(find . -name 'test_*.py')" ]; then
+            pytest
+          else
+            echo "No test files found, skipping pytest."
+          fi
+
+  build_and_push_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Dependencies
+        run: pip install -r ${requirements_file}
+
+      - name: Build and Tag Docker Image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${container_registry_url} != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          # Build Docker image
+          docker build -t ${APP_NAME}:${APP_VERSION} .
+
+          # Log in to your container registry (e.g., AWS ECR)
+          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${container_registry_url}
+
+          # Tag the Docker image for ECR (you can use semantic versioning or other strategies here)
+          docker tag ${APP_NAME}:${APP_VERSION} ${container_registry_url}/${APP_NAME}:${APP_VERSION}
+
+      - name: Push Code to AWS CodeCommit and AWS ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${container_registry_url} != ''
+        run: |
+          # Assuming you have AWS CLI configured with appropriate credentials
+          
+          # Push the Docker image to the registry
+          docker push ${container_registry_url}/${APP_NAME}:${APP_VERSION}
+
+          git push  ${codecommit_repo}
