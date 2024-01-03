@@ -35,14 +35,13 @@ class RetrieverChainConstructor(BaseChainConstructor):
         self.embeddings = Embeddings
         self.llm = LLM
 
-        self._load_memory()
         self._load_prompt()
         self._load_vector_store()
         self._get_retriever()        
 
     def form_chain(self) -> RetrievalQA:
         try:
-            chain_type_kwargs = {"prompt": self.prompt,"memory":self.memory}
+            chain_type_kwargs = {"prompt": self.prompt}
             qa_chain = RetrievalQA.from_chain_type(llm=self.llm, 
                                             chain_type="stuff", 
                                             retriever=self.retriever,
@@ -64,26 +63,13 @@ class RetrieverChainConstructor(BaseChainConstructor):
                 prompt_template = file.read()
             
             self.prompt = PromptTemplate(
-                template=prompt_template, input_variables=["chat_history","context","question"]
+                template=prompt_template, input_variables=["context","question"]
             )
             logger.info(f"Prompt Construction.............Done")
         except Exception as e:
             error_logger.error(f"Error loading prompt: {e}", exc_info=True)
             raise ValueError(f"Error loading prompt: {e}")
 
-    def _load_memory(self) -> None:
-        try:
-            self.memory =  ConversationBufferMemory(                        
-                            memory_key="chat_history",
-                            input_key="question" ,
-                            output_key='output_text',
-                            return_messages=True,
-                            k=3
-            )
-            logger.info(f"Memory Construction.............Done")
-        except Exception as e:
-            error_logger.error(f"Error loading memory: {e}", exc_info=True)
-            raise ValueError(f"Error loading memory: {e}")
         
     def _load_vector_store(self)-> None:
         try:
