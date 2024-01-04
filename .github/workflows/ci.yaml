@@ -27,7 +27,7 @@ jobs:
           python-version: 3.9
 
       - name: Install Dependencies
-        run: pip install -r ${requirements_file}
+        run: pip install -r ${{ env.requirements_file }}
 
       - name: Linting and Code Analysis
         run: |
@@ -56,29 +56,29 @@ jobs:
           python-version: 3.9
 
       - name: Install Dependencies
-        run: pip install -r ${requirements_file}
+        run: pip install -r ${{ env.requirements_file }}
 
       - name: Build and Tag Docker Image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${container_registry_url} != ''
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${{env.container_registry_url}} != ''
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           # Build Docker image
-          docker build -t ${APP_NAME}:${APP_VERSION} .
+          docker build -t ${{env.APP_NAME}}:${{env.APP_VERSION}} .
 
           # Log in to your container registry (e.g., AWS ECR)
-          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${container_registry_url}
+          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${{env.container_registry_url}}
 
           # Tag the Docker image for ECR (you can use semantic versioning or other strategies here)
-          docker tag ${APP_NAME}:${APP_VERSION} ${container_registry_url}/${APP_NAME}:${APP_VERSION}
+          docker tag ${{env.APP_NAME}}:${{env.APP_VERSION} ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}
 
       - name: Push Code to AWS CodeCommit and AWS ECR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${container_registry_url} != ''
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${{env.container_registry_url}} != ''
         run: |
           # Assuming you have AWS CLI configured with appropriate credentials
           
           # Push the Docker image to the registry
-          docker push ${container_registry_url}/${APP_NAME}:${APP_VERSION}
+          docker push${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
-          git push  ${codecommit_repo}
+          git push  ${{env.codecommit_repo}}
