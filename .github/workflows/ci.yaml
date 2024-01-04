@@ -79,6 +79,6 @@ jobs:
           # Assuming you have AWS CLI configured with appropriate credentials
           
           # Push the Docker image to the registry
-          docker push${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
+          docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
           git push  ${{env.codecommit_repo}}
