@@ -1,7 +1,7 @@
 name: CI Pipeline
 
 env:
-  APP_NAME: 'qaai-system'
+  APP_NAME: 'qaai_system'
   APP_VERSION: '0.1.0'
   requirements_file: 'requirements-prod.txt'
   container_registry_url: '167071742774.dkr.ecr.us-west-2.amazonaws.com'
