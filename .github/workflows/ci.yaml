@@ -73,6 +73,7 @@ jobs:
           # Tag the Docker image for ECR (you can use semantic versioning or other strategies here)
           docker tag ${{env.APP_NAME}}:${{env.APP_VERSION}} ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
+          docker images
       - name: Push Code to AWS CodeCommit and AWS ECR
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${{env.container_registry_url}} != ''
         run: |
