@@ -91,10 +91,9 @@ jobs:
           git config --global credential.helper '!aws codecommit credential-helper $@'
           git config --global credential.UseHttpPath true
 
-      - name: Pull Changes from AWS CodeCommit (Optional)
-        run: |
-          git pull ${{ env.codecommit_repo }} main --allow-unrelated-histories
-
       - name: Push to AWS CodeCommit
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           git push ${{ env.codecommit_repo }} main --force
