@@ -92,7 +92,7 @@ jobs:
 
       - name: Fetch Latest from AWS CodeCommit
         run: |
-          git fetch codecommit_repo main
+          git fetch ${{env.codecommit_repo}} main
 
       - name: Push to AWS CodeCommit
         run: |
