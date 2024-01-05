@@ -10,7 +10,7 @@ env:
 on:
   push:
     branches:
-      - '*'
+      - '**'
 
 
 jobs:
@@ -43,40 +43,46 @@ jobs:
             echo "No test files found, skipping pytest."
           fi
 
-  # build_and_push_image:
-  #   runs-on: ubuntu-latest
+  build_and_push_image:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
+    steps:
+      - name: Check Container Registry URL
+        run: |
+          if [ -z "${{ env.container_registry_url }}" ]; then
+            echo "Container Registry URL is not set. Exiting..."
+            exit 1
+          fi
+  
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: 3.9
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
 
-  #     - name: Build and Tag Docker Image
-  #       if: github.event_name == 'push' && ${{env.container_registry_url}} != ''
-  #       env:
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #       run: |
-  #         docker build -t ${{env.APP_NAME}}:${{env.APP_VERSION}} .
+      - name: Build and Tag Docker Image
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          docker build -t ${{env.APP_NAME}}:${{env.APP_VERSION}} .
 
-  #         # Log in to your container registry (e.g., AWS ECR)
-  #         aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${{env.container_registry_url}}
+          # Log in to your container registry (e.g., AWS ECR)
+          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${{env.container_registry_url}}
 
-  #         # Tag the Docker image for ECR (you can use semantic versioning or other strategies here)
-  #         docker tag ${{env.APP_NAME}}:${{env.APP_VERSION}} ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
+          # Tag the Docker image for ECR (you can use semantic versioning or other strategies here)
+          docker tag ${{env.APP_NAME}}:${{env.APP_VERSION}} ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
-  #     - name: Push Code to AWS CodeCommit and AWS ECR
-  #       if: github.event_name == 'push' && ${{env.container_registry_url}} != ''
-  #       env:
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #       run: |
-  #         docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
+      - name: Push Code to AWS CodeCommit and AWS ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
-  #         git config --global credential.helper '!aws codecommit credential-helper $@'
-  #         git config --global credential.UseHttpPath true
-  #         git push --force ${{env.codecommit_repo}} main 
+          git config --global credential.helper '!aws codecommit credential-helper $@'
+          git config --global credential.UseHttpPath true
+          git push --force ${{env.codecommit_repo}} main 
