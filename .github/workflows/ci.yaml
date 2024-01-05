@@ -51,8 +51,10 @@ jobs:
       - name: Check Container Registry URL
         run: |
           if [ -z "${{ env.container_registry_url }}" ]; then
-            echo "Container Registry URL is not set. Exiting..."
-            exit 1
+            echo "Container Registry URL is not set. Skipping subsequent steps..."
+            echo "::set-output name=proceed::false"
+          else
+            echo "::set-output name=proceed::true"
           fi
   
       - name: Checkout code
@@ -76,13 +78,22 @@ jobs:
           # Tag the Docker image for ECR (you can use semantic versioning or other strategies here)
           docker tag ${{env.APP_NAME}}:${{env.APP_VERSION}} ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
-      - name: Push Code to AWS CodeCommit and AWS ECR
+      - name: Push Code to AWS ECR
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
-
+      
+      - name: Configure Git for AWS CodeCommit
+        run: |
           git config --global credential.helper '!aws codecommit credential-helper $@'
           git config --global credential.UseHttpPath true
-          git push --force ${{env.codecommit_repo}} main 
+
+      - name: Fetch Latest from AWS CodeCommit
+        run: |
+          git fetch codecommit_repo main
+
+      - name: Push to AWS CodeCommit
+        run: |
+          git push ${{env.codecommit_repo}} HEAD:main
