@@ -55,9 +55,6 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Install Dependencies
-        run: pip install -r ${{ env.requirements_file }}
-
       - name: Build and Tag Docker Image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && ${{env.container_registry_url}} != ''
         env:
@@ -86,4 +83,4 @@ jobs:
 
           git config --global credential.helper '!aws codecommit credential-helper $@'
           git config --global credential.UseHttpPath true
-          git push ${{env.codecommit_repo}}
+          git push ${{env.codecommit_repo}} main --force
