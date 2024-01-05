@@ -92,6 +92,9 @@ jobs:
           git config --global credential.UseHttpPath true
 
       - name: Pull Latest from AWS CodeCommit with Merge Strategy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           git config pull.rebase false
           git pull ${{env.codecommit_repo}} main
