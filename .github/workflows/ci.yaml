@@ -80,4 +80,4 @@ jobs:
 
           git config --global credential.helper '!aws codecommit credential-helper $@'
           git config --global credential.UseHttpPath true
-          git push ${{env.codecommit_repo}} main --force
+          git push --force ${{env.codecommit_repo}} main 
