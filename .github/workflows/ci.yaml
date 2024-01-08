@@ -83,6 +83,11 @@ jobs:
 
           docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
       
+      - name: Clone GitHub Repository
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
       - name: Configure Git for AWS CodeCommit
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
