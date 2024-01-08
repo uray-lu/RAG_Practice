@@ -102,4 +102,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           git pull --rebase=false --allow-unrelated-histories ${{ env.codecommit_repo }} main
+          git add .
+          git commit -m "Up to date"
           git push ${{ env.codecommit_repo }} main
