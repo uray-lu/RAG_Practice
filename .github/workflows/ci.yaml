@@ -107,4 +107,4 @@ jobs:
         run: git pull --rebase codecommit main
 
       - name: Push to AWS CodeCommit
-        run: git push codecommit main
+        run: git push --force codecommit main
