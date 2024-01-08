@@ -1,3 +1,7 @@
+"""
+Utility functions.
+"""
+
 import json
 import os
 import logging
@@ -7,29 +11,41 @@ import yaml
 class JsonEncoder(json.JSONEncoder):
     
     def default(self, obj):
-        
+        """
+        Convert custom objects to JSON serializable objects.
+        """
         if isinstance(obj, set):
             return list(obj)
         
-        return json.JSONEncoder.default(self, obj)
-    
+        return super().default(obj)  # Renamed 'o' to 'obj' as suggested
+
 class JsonLoader:
 
     @staticmethod
     def load(file_path):
+        """
+        Load JSON data from a file.
+        """
         with open(file_path, 'r') as file:
             return json.load(file)
+    
     @staticmethod
     def save(file_path, data):
+        """
+        Save JSON data to a file.
+        """
         with open(file_path, 'w', encoding="utf-8") as file:
             json.dump(data, file)
 
-
 class CsvService:
-    """handle csv function"""
+    """
+    Handle CSV functions.
+    """
     @staticmethod
     def is_csv_file(file_path: str) -> bool:
-        """determine csv file"""
+        """
+        Determine if a file is a CSV file.
+        """
         _, file_ext = os.path.splitext(file_path)
 
         return file_ext.lower() == '.csv'
@@ -41,11 +57,12 @@ class Logger:
     loggers = {}
     @classmethod
     def setup_logger(cls, name=None):
-
+        """
+        Set up and return a logger with the name provided.
+        """
         if name in cls.loggers:
             return cls.loggers[name]
 
-        """Set up and return a logger with the name provided."""
         if name:
             log_config = cls.config.get(name, {})
             if not log_config:
@@ -56,10 +73,9 @@ class Logger:
         log_file = log_config.get('log_file', 'default.log')
         os.makedirs(os.path.dirname(log_file), exist_ok=True)
         level = log_config.get('level', logging.INFO)
-        format = log_config.get('format', '%(asctime)s - %(levelname)s - %(message)s')
-        
+        log_format = log_config.get('format', '%(asctime)s - %(levelname)s - %(message)s')  # Renamed 'format' variable
 
-        formatter = logging.Formatter(format)
+        formatter = logging.Formatter(log_format)
         handler = RotatingFileHandler(
             log_file, 
             maxBytes=log_config.get('maxBytes', 1024 * 1024 * 100), 
@@ -77,8 +93,8 @@ class Logger:
         cls.loggers[name] = logger
 
         return logger
-    
-    #TODO: migration to cloud watch
+
+    # TODO: migration to cloud watch
     # import watchtower
     # def setup_logger(cls, name):
     #     logger = logging.getLogger(name)
