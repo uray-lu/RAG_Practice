@@ -91,10 +91,15 @@ jobs:
           git config --global credential.helper '!aws codecommit credential-helper $@'
           git config --global credential.UseHttpPath true
 
+      - name: Set Git user email and name
+        run: |
+          git config --local user.email raylu@gamania.com
+          git config --local user.name raylu
+
       - name: Push to AWS CodeCommit
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          git pull --rebase=false ${{ env.codecommit_repo }} main
+          git pull --rebase=false --allow-unrelated-histories ${{ env.codecommit_repo }} main
           git push ${{ env.codecommit_repo }} main
