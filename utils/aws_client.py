@@ -1,9 +1,14 @@
+"""
+Aws client module for connecting to AWS services.
+"""
+
 from abc import ABC, abstractmethod
 import boto3
 import botocore
 from langchain.embeddings import BedrockEmbeddings
 from langchain.chat_models import BedrockChat
 from utils import Logger
+
 logger = Logger.setup_logger()
 error_logger = Logger.setup_logger('error')
 
@@ -23,7 +28,7 @@ class AWSClient(ABC):
 class CloudEmbeddingModel(ABC):
     
     @abstractmethod
-    def get_embedding_model(self, **kwargs)-> BedrockEmbeddings:
+    def get_embedding_model(self, **kwargs) -> BedrockEmbeddings:
         """Retrieve or create a cloud embedding model."""
         pass
 
@@ -43,7 +48,7 @@ class CloudLLMModel(ABC):
 
 
 class AWSBedrockEembedding(AWSClient, CloudEmbeddingModel):
-    def get_embedding_model(self)-> BedrockEmbeddings:      
+    def get_embedding_model(self) -> BedrockEmbeddings:      
         self.authenticate()
         try:
             # Attempt to create a BedrockEmbeddings object
@@ -83,7 +88,7 @@ class AWSBedRockLLM(AWSClient, CloudLLMModel):
                 ),
                 model_id="anthropic.claude-v2" 
             )
-            llm.model_kwargs = {"temperature": 0,'max_tokens_to_sample':700}
+            llm.model_kwargs = {"temperature": 0, 'max_tokens_to_sample': 700}
         except Exception as e:
             error_logger.error("An error occurred while initializing Bedrock LLM", exc_info=True)
             raise Exception("An error occurred while initializing Bedrock LLM") from e
