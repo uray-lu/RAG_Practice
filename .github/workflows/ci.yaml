@@ -102,4 +102,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           CODECOMMIT_REPO: ${{ env.codecommit_repo }}
         run: |
-          git push "${CODECOMMIT_REPO}" main
+          git push --force "${CODECOMMIT_REPO}" main
