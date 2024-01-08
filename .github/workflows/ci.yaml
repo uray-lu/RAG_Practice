@@ -100,4 +100,3 @@ jobs:
         with:
           repository_name: ${{ env.codecommit_repo_name }}
           aws_region: us-west-2
-          branch: main
