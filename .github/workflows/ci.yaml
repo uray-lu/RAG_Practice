@@ -107,7 +107,7 @@ jobs:
         run: git fetch codecommit main
 
       - name: Merge CodeCommit main into Local main
-        run: git merge codecommit/main
+        run: git merge codecommit/main --allow-unrelated-histories
 
       - name: Push to AWS CodeCommit
         run: git push codecommit main
