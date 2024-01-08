@@ -103,13 +103,10 @@ jobs:
       - name: Add CodeCommit as a Remote Repository
         run: git remote add codecommit "${{ env.codecommit_repo }}"
 
-      - name: Fetch CodeCommit main Branch
-        run: git fetch codecommit main
-
-      - name: Reset Conflicting Files to GitHub Version
+      - name: Clean and Reset Local Repository
         run: |
-          git checkout --ours .
-          git add .
+          git reset --hard HEAD
+          git clean -fdx
 
       - name: Push to AWS CodeCommit
         run: git push --force codecommit main
