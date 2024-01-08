@@ -97,4 +97,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           git remote add codecommit-repo ${{ env.codecommit_repo }}
-          git push ${{ env.codecommit_repo }}
+          git pull codecommit-repo main
+          git push codecommit-repo main
