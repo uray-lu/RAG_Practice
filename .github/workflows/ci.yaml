@@ -82,20 +82,22 @@ jobs:
           aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${{env.container_registry_url}}
 
           docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
-      
+       
+       - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-          
-      - name: Set Repository as Safe Directory for Git
-        run: |
-          git config --global --add safe.directory /github/workspace
 
       - name: Sync up to CodeCommit
         uses: tsgit18/sync-up-to-codecommit-action@v1
         with:
           repository_name: ${{ env.codecommit_repo_name }}
           aws_region: us-west-2
+          branch: main
