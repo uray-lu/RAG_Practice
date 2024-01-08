@@ -110,9 +110,6 @@ jobs:
         run: |
           git checkout --ours .
           git add .
-      
-      - name: Commit the Conflict Resolution
-        run: git commit -m "Resolve conflicts favoring GitHub version"
 
       - name: Push to AWS CodeCommit
         run: git push codecommit main
