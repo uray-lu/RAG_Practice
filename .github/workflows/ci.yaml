@@ -83,10 +83,8 @@ jobs:
 
           docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
        
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -95,8 +93,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
 
-      - name: Sync up to CodeCommit
-        uses: tsgit18/sync-up-to-codecommit-action@v1
-        with:
-          repository_name: ${{ env.codecommit_repo_name }}
-          aws_region: us-west-2
+      - name: Configure Git for AWS CodeCommit
+        run: |
+          git config --global credential.helper '!aws codecommit credential-helper $@'
+          git config --global credential.UseHttpPath true
+          git config --global user.email "raylu@gamania.com"
+          git config --global user.name "raylu"
+
+      - name: Push to AWS CodeCommit
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          CODECOMMIT_REPO: ${{ env.codecommit_repo }}
+        run: |
+          git push --force "${CODECOMMIT_REPO}" main:main
