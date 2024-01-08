@@ -97,4 +97,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           git config push.default current
-          git push ${{ env.codecommit_repo }} main
+          git push ${{ env.codecommit_repo }}
