@@ -112,4 +112,4 @@ jobs:
           git add .
 
       - name: Push to AWS CodeCommit
-        run: git --force push codecommit main
+        run: git push --force codecommit main
