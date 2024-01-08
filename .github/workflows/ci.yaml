@@ -106,8 +106,13 @@ jobs:
       - name: Fetch CodeCommit main Branch
         run: git fetch codecommit main
 
-      - name: Merge CodeCommit main into Local main
-        run: git merge codecommit/main --allow-unrelated-histories
+      - name: Reset Conflicting Files to GitHub Version
+        run: |
+          git checkout --ours .
+          git add .
+      
+      - name: Commit the Conflict Resolution
+        run: git commit -m "Resolve conflicts favoring GitHub version"
 
       - name: Push to AWS CodeCommit
         run: git push codecommit main
