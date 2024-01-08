@@ -83,30 +83,30 @@ jobs:
 
           docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
        
-      - name: Checkout code
-        uses: actions/checkout@v2
+      # - name: Checkout code
+      #   uses: actions/checkout@v2
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
 
-      - name: Configure Git for AWS CodeCommit
-        run: |
-          git config --global credential.helper '!aws codecommit credential-helper $@'
-          git config --global credential.UseHttpPath true
-          git config --global user.email "raylu@gamania.com"
-          git config --global user.name "raylu"
+      # - name: Configure Git for AWS CodeCommit
+      #   run: |
+      #     git config --global credential.helper '!aws codecommit credential-helper $@'
+      #     git config --global credential.UseHttpPath true
+      #     git config --global user.email "raylu@gamania.com"
+      #     git config --global user.name "raylu"
 
-      - name: Add CodeCommit as a Remote Repository
-        run: git remote add codecommit "${{ env.codecommit_repo }}"
+      # - name: Add CodeCommit as a Remote Repository
+      #   run: git remote add codecommit "${{ env.codecommit_repo }}"
 
-      - name: Clean and Reset Local Repository
-        run: |
-          git reset --hard HEAD
-          git clean -fdx
+      # - name: Clean and Reset Local Repository
+      #   run: |
+      #     git reset --hard HEAD
+      #     git clean -fdx
 
-      - name: Push to AWS CodeCommit
-        run: git push --force codecommit main
+      # - name: Push to AWS CodeCommit
+      #   run: git push --force codecommit main
