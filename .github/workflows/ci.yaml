@@ -87,6 +87,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
+          fetch-depth: 1 
 
       - name: Configure Git for AWS CodeCommit
         env:
