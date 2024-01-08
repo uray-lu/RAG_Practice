@@ -103,8 +103,11 @@ jobs:
       - name: Add CodeCommit as a Remote Repository
         run: git remote add codecommit "${{ env.codecommit_repo }}"
 
-      - name: Fast-Forward Local main to CodeCommit main
-        run: git pull --ff-only codecommit main
+      - name: Fetch CodeCommit main Branch
+        run: git fetch codecommit main
+
+      - name: Merge CodeCommit main into Local main
+        run: git merge codecommit/main
 
       - name: Push to AWS CodeCommit
         run: git push codecommit main
