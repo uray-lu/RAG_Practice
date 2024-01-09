@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: Check Container Registry URL
         run: |
-          if [ -z "${{ env.container_registry_url }}" ]; then
+          if [ -z "${{ vars.CONTAINER_REGISTRY_URL }}" ]; then
             echo "Container Registry URL is not set. Skipping subsequent steps..."
             echo "::set-output name=proceed::false"
           else
@@ -74,16 +74,16 @@ jobs:
         run: |
           docker build -t ${{env.APP_NAME}}:${{env.APP_VERSION}} .
 
-          docker tag ${{env.APP_NAME}}:${{env.APP_VERSION}} ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
+          docker tag ${{env.APP_NAME}}:${{env.APP_VERSION}} ${{vars.CONTAINER_REGISTRY_URL}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
       - name: Push Code to AWS ECR
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${{env.container_registry_url}}
+          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${{vars.CONTAINER_REGISTRY_URL}}
 
-          docker push ${{env.container_registry_url}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
+          docker push ${{vars.CONTAINER_REGISTRY_URL}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
        
       - name: Checkout code
         uses: actions/checkout@v2
@@ -105,7 +105,7 @@ jobs:
           git config --global user.name "${{ env.AUTHOR }}"
 
       - name: Add CodeCommit as a Remote Repository
-        run: git remote add codecommit "${{ env.codecommit_repo }}"
+        run: git remote add codecommit "${{ vars.CODECOMMIT_REPO }}"
 
       - name: Push to AWS CodeCommit
         run: git push --force codecommit main
