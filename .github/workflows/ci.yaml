@@ -103,5 +103,10 @@ jobs:
       - name: Add CodeCommit as a Remote Repository
         run: git remote add codecommit "${{ env.codecommit_repo }}"
 
+      - name: Clean and Reset Local Repository
+        run: |
+          git reset --hard HEAD
+          git clean -fdx
+
       - name: Push to AWS CodeCommit
         run: git push --force codecommit main
