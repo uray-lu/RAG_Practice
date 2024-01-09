@@ -3,6 +3,8 @@ name: CI Pipeline
 env:
   APP_NAME: 'qaai_system'
   APP_VERSION: '0.1.0'
+  AUTHOR: 'Ray Lu'
+  AUTHOR_EMAIL: 'raylu@gamania.com'
   requirements_file: 'requirements-prod.txt'
   container_registry_url: '167071742774.dkr.ecr.us-west-2.amazonaws.com'
   codecommit_repo: 'https://git-codecommit.us-west-2.amazonaws.com/v1/repos/qaai-api'
@@ -99,8 +101,8 @@ jobs:
         run: |
           git config --global credential.helper '!aws codecommit credential-helper $@'
           git config --global credential.UseHttpPath true
-          git config --global user.email "raylu@gamania.com"
-          git config --global user.name "raylu"
+          git config --global user.email "${{ env.AUTHOR_EMAIL }}"
+          git config --global user.name "${{ env.AUTHOR }}"
 
       - name: Add CodeCommit as a Remote Repository
         run: git remote add codecommit "${{ env.codecommit_repo }}"
