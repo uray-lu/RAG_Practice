@@ -5,7 +5,7 @@ Aws client module for connecting to AWS services.
 from abc import ABC, abstractmethod
 import boto3
 import botocore
-from langchain.embeddings import BedrockEmbeddings
+from langchain_community.embeddings.bedrock import BedrockEmbeddings
 from langchain.chat_models import BedrockChat
 from utils import Logger
 
