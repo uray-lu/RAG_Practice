@@ -73,8 +73,9 @@ class RetrieverChainConstructor(BaseChainConstructor):
         
     def _load_vector_store(self)-> None:
         try:
-            if not os.path.exists(self.config.vector_db_path):
-                self.db_handler.sync_from_cloud(s3_prefix=self.remote_vector_db_path, local_folder=self.config.vector_db_path)
+            vector_db_path = self.config.vector_db_path
+            if not os.path.exists(vector_db_path) or not any(file in os.listdir(vector_db_path) for file in ["index.faiss", "index.pkl"]):
+                self.db_handler.sync_from_cloud(s3_prefix=self.remote_vector_db_path, local_folder=vector_db_path)
             
             self.vector_store = FAISS.load_local(
                                     self.config.vector_db_path, self.embeddings, normalize_L2=True
