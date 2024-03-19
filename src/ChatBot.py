@@ -38,7 +38,7 @@ class ChatBot:
             logger.info(f"Make response.............Done")
             return answer, metadata
         else:
-            answer = "您好，對不起，根據已知的資訊，我無法回答您的問題。請您換一個問題，或是詢問台灣遊戲橘子流程辦法相關的問題，讓我能更好的為您服務，謝謝您。\n 您可以試著詢問我如: \n 如何申請Tableau權限 \n 資訊安全相關規範的注意事項 \n 需求工單如何作業 " 
+            answer = "您好，對不起，根據已知的資訊，我無法回答您的問題。請您換一個問題" 
             metadata = "------------------------------------\n參考資料:\n無\n------------------------------------\n" 
             
             logger.info(f"Make default response.............Done")
